@@ -2,8 +2,8 @@
 
 **Course**: Mobile Security  
 **Project Type**: Group Capstone  
-**Semester**: [Insert semester here]  
-**Team Members**: [Add your names here]
+**Semester**: Summer 2025  
+**Team Members**: Samuel Okechukwu, ...
 
 ---
 
@@ -31,8 +31,8 @@ This hands-on approach allows us to analyze real vulnerabilities using tools lik
 
 ### 🔧 Phase 1: Project Setup
 
-- [ ] Create Android Studio project (language: Kotlin)
-- [ ] Set up GitHub repository
+- [x] Create Android Studio project (language: Kotlin)
+- [x] Set up GitHub repository
 - [ ] Define app architecture (MVVM + local storage)
 - [ ] Define UI mockups (main screen, memo detail screen, add photo memo)
 
