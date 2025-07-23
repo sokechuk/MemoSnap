@@ -3,7 +3,7 @@
 **Course**: Mobile Security  
 **Project Type**: Group Capstone  
 **Semester**: Summer 2025  
-**Team Members**: Samuel Okechukwu, ...
+**Team Members**: Samuel Okechukwu, Jeremy Bivens, Chaz James, Zengtao Wu
 
 ---
 
