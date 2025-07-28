@@ -1,24 +1,36 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/groupListContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Groups placeholder -->
-    <TextView
+    <Button
+        android:id="@+id/btnCreateGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="My Groups (Nested navigation placeholder)"
-        android:textSize="18sp"
-        android:gravity="center"
-        android:layout_marginBottom="16dp" />
+        android:text="Create Group" />
 
-    <!-- Invite Friend button -->
     <Button
         android:id="@+id/btnInviteFriend"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Invite Friend"
-        android:layout_gravity="center_horizontal" />
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/tvGroupTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your Groups:"
+        android:textStyle="bold"
+        android:paddingTop="10dp" />
+
+    <LinearLayout
+        android:id="@+id/groupListLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
 </LinearLayout>

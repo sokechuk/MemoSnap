@@ -3,12 +3,14 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.InputType
 import android.view.*
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
@@ -78,17 +80,27 @@ class MyPhotosFragment : Fragment() {
         val container = view?.findViewById<GridLayout>(R.id.recentPhotoContainer)
         container?.removeAllViews()
 
+        val displayMetrics = resources.displayMetrics
+        val screenWidth = displayMetrics.widthPixels
+        val imageSize = (screenWidth - 5 * 8) / 4  // 4列，5个间隔
+
         val files = requireContext().filesDir.listFiles()
-        val recentFiles = files?.sortedByDescending { it.lastModified() }?.take(20)
+        val recentFiles = files?.sortedByDescending { it.lastModified() }
 
         recentFiles?.forEach { file ->
-            val imageView = ImageView(requireContext())
             val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+            val imageView = ImageView(requireContext())
             imageView.setImageBitmap(bitmap)
-            val size = resources.displayMetrics.widthPixels / 4 - 16 // adjust for padding/margin
-            val params = ViewGroup.MarginLayoutParams(size, size)
+
+            val params = ViewGroup.MarginLayoutParams(imageSize, imageSize)
             params.setMargins(8, 8, 8, 8)
             imageView.layoutParams = params
+            imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+
+
+            imageView.setOnClickListener {
+                showImagePreview(Uri.fromFile(file))
+            }
 
             container?.addView(imageView)
         }
@@ -143,5 +155,63 @@ class MyPhotosFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadRecentPhotos() // Safely call this here to ensure view is ready
+    }
+    private fun showImagePreview(photoUri: Uri) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_image_preview_with_comment, null)
+        val imageView = dialogView.findViewById<ImageView>(R.id.fullscreenImageView)
+        val commentButton = dialogView.findViewById<Button>(R.id.btnComment)
+        val commentText = dialogView.findViewById<TextView>(R.id.tvPhotoComment)
+
+        imageView.setImageURI(photoUri)
+
+        val existingComment = getCommentForImage(photoUri)
+        if (!existingComment.isNullOrEmpty()) {
+            commentText.text = "Comment: $existingComment"
+            commentText.visibility = View.VISIBLE
+        }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setPositiveButton("Close", null)
+            .create()
+
+        commentButton.setOnClickListener {
+            showCommentDialog(photoUri) {
+                commentText.text = "Comment: $it"
+                commentText.visibility = View.VISIBLE
+            }
+        }
+
+        dialog.show()
+    }
+    private fun showCommentDialog(photoUri: Uri, onCommentSaved: (String) -> Unit) {
+        val input = EditText(requireContext())
+        input.hint = "Enter your comment"
+        input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Add Comment")
+            .setView(input)
+            .setPositiveButton("Submit") { _, _ ->
+                val comment = input.text.toString()
+                saveCommentForImage(photoUri, comment)
+                Toast.makeText(requireContext(), "Comment saved", Toast.LENGTH_SHORT).show()
+                onCommentSaved(comment)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    private fun saveCommentForImage(photoUri: Uri, comment: String) {
+        val prefs = requireContext().getSharedPreferences("photo_comments", 0)
+        val editor = prefs.edit()
+        val key = photoUri.lastPathSegment ?: return
+        editor.putString(key, comment)
+        editor.apply()
+    }
+
+    private fun getCommentForImage(photoUri: Uri): String? {
+        val prefs = requireContext().getSharedPreferences("photo_comments", 0)
+        val key = photoUri.lastPathSegment ?: return null
+        return prefs.getString(key, null)
     }
 }
