@@ -156,6 +156,19 @@ class MyPhotosFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         loadRecentPhotos() // Safely call this here to ensure view is ready
     }
+    private fun saveToRecent(photoUri: Uri) {
+        val prefs = requireContext().getSharedPreferences("recent_photos", 0)
+        val key = "recent_list"
+
+        val path = File(photoUri.path ?: return).absolutePath // 更保险
+
+        val currentSet = prefs.getStringSet(key, mutableSetOf())?.toMutableList() ?: mutableListOf()
+        currentSet.remove(path)
+        currentSet.add(0, path)
+
+        val limitedSet = currentSet.take(20).toSet()
+        prefs.edit().putStringSet(key, limitedSet).apply()
+    }
     private fun showImagePreview(photoUri: Uri) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_image_preview_with_comment, null)
         val imageView = dialogView.findViewById<ImageView>(R.id.fullscreenImageView)
@@ -181,6 +194,8 @@ class MyPhotosFragment : Fragment() {
                 commentText.visibility = View.VISIBLE
             }
         }
+        saveToRecent(photoUri)
+
 
         dialog.show()
     }
