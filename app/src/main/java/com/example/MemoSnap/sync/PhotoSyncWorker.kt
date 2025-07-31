@@ -18,7 +18,7 @@ class PhotoSyncWorker(
         val unsynced = photoDao.getUnsynced()
 
         for (photo in unsynced) {
-            val success = uploadToServer(photo) // TODO: Replace with real upload
+            val success = uploadToServer(photo)
             if (success) {
                 photoDao.update(photo.copy(isSynced = true))
             }
